@@ -26,5 +26,5 @@ func main()  {
 	res := make([]byte, 1024)
 	conn.Read(res)
 	conn.Close()
-	fmt.Println(res)
+	fmt.Println(string(res))
 }
