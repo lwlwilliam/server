@@ -1,9 +1,9 @@
 // error code
 package error
 
-type errorCode int
+type errorCode interface {}
 
 const (
-	FATAL   = errorCode(1)
-	WARNING = errorCode(2)
+	FATAL   = 1
+	WARNING = 2
 )

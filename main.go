@@ -4,24 +4,32 @@ import (
 	"flag"
 	"log"
 	"net"
+	"os"
 
 	error2 "github.com/lwlwilliam/httpServer/error"
 	"github.com/lwlwilliam/httpServer/request"
 )
 
+const (
+	HOST = "localhost"
+	PORT = "8000"
+)
+
 func main() {
-	hostname := flag.String("h", "localhost", "hostname")
-	port := flag.String("p", "8080", "port")
+	hostname := flag.String("h", HOST, "hostname")
+	port := flag.String("p", PORT, "port")
 
 	ld, err := net.Listen("tcp", *hostname+":"+*port)
-	error2.Fatal("Listening", err)
+	if err != nil {
+		log.Printf("Listening: %s\n", err.Error())
+		os.Exit(error2.FATAL)
+	}
 
 	for {
 		conn, err := ld.Accept()
 		if err != nil {
-			log.Println(err)
+			log.Printf("Accept: %s\n", err.Error())
 			err = conn.Close()
-			log.Println(err)
 			continue
 		}
 
