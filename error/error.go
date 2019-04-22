@@ -6,15 +6,17 @@ import (
 	"os"
 )
 
-func Fatal(err error) {
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(FATAL)
-	}
+func Fatal(extra string, err error) {
+	errHandler(extra, err)
+	os.Exit(int(FATAL))
 }
 
-func Warning(err error) {
+func Warning(extra string, err error) {
+	errHandler(extra, err)
+}
+
+func errHandler(extra string, err error) {
 	if err != nil {
-		log.Fatal(WARNING)
+		log.Printf("%s: %s\n", extra, err.Error())
 	}
 }

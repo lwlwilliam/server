@@ -1,7 +1,9 @@
 // error code
 package error
 
+type errorCode int
+
 const (
-	FATAL   = 1 // fatal error
-	WARNING = 2 // warning
+	FATAL   = errorCode(1)
+	WARNING = errorCode(2)
 )

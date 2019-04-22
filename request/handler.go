@@ -1,29 +1,24 @@
 package request
 
 import (
-	"bytes"
+	"bufio"
 	"log"
 	"net"
-	"os"
 )
 
 func Handler(conn net.Conn) {
 	defer conn.Close()
-	tmp := make([]byte, 1)
-	buf := bytes.NewBuffer(nil)
-
+	tmp := make([]byte, 1024)
+	writer := bufio.NewWriter(conn)
 	for {
 		// TODO: 怎么读，读多少字节，这是个问题
-		_, err := conn.Read(tmp)
+		n, err := conn.Read(tmp)
 		if err != nil {
 			log.Printf("conn.Read: %s", err.Error())
 			break
 		}
-		buf.Write(tmp)
+		writer.Write(tmp[:n])
 	}
 
-	_, err := buf.WriteTo(os.Stdout)
-	if err != nil {
-		log.Println("buf.WriteTo:", err.Error())
-	}
+	writer.Flush()
 }
