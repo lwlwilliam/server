@@ -2,6 +2,12 @@ package response
 
 import "errors"
 
+type ResponseLine struct {
+	Version []byte
+	Code string
+	Status []byte
+}
+
 const (
 	OK                    = "200"
 	NOT_FOUND             = "404"

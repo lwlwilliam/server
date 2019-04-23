@@ -9,13 +9,8 @@ import (
 	"strings"
 )
 
-type RequestLine struct {
-	Version []byte
-	Code string
-	Status []byte
-}
-
-func requestLine(line string) (r RequestLine, content []byte) {
+// 解析请求行
+func parseReqLine(line string) (r response.ResponseLine, content []byte) {
 	reqSlice := strings.Split(line, " ")
 	if len(reqSlice) != 3 {
 		//http.StatusBadRequest
@@ -56,10 +51,11 @@ func requestLine(line string) (r RequestLine, content []byte) {
 	return
 }
 
+// GET 方法处理
 func get(path string) (code string, status []byte, body []byte) {
 	wd, _ := os.Getwd()
-	log.Printf("working directory: %s\n", wd)
-	log.Printf("request path: %s\n", path)
+	//log.Printf("working directory: %s\n", wd)
+	//log.Printf("request path: %s\n", path)
 	log.Println(runtime.GOOS)
 	if path == "/" {
 		path = "index.html"

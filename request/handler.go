@@ -12,29 +12,23 @@ import (
 func Handler(conn net.Conn) {
 	defer conn.Close()
 
-	tmp := make([]byte, 1024)
+	buf := make([]byte, 1024)
 	//for {
-		// TODO: 怎么读，读多少字节，这是个问题
-		n, err := conn.Read(tmp)
+		// TODO: 怎么读，读多少字节，这是个问题，暂时用一个大的 slice 确保读完所有内容吧
+		n, err := conn.Read(buf)
 		if err != nil && err != io.EOF {
 			log.Printf("Read: %s\n", err.Error())
 			//	break
 		}
 	//}
 
-	tmpstr := string(tmp[:n])
-	reqLine := strings.Split(tmpstr, "\n")[0]
-	headerLine, body := requestLine(reqLine)
-	respStatus := string(headerLine.Version) + " " +
-		headerLine.Code + " " +
-		string(headerLine.Status) + "\r\n"
+	reqString := string(buf[:n])
 
-	respHeader := response.TEXT_PLAIN + "\r\n"
-	emptyLine := "\r\n"
-	respBody := string(body)
+	// 解析请求行
+	reqStringLine := strings.Split(reqString, "\n")[0] // 请求行
+	respLine, body := parseReqLine(reqStringLine)
 
-	_, err = conn.Write([]byte(respStatus + respHeader + emptyLine + respBody))
-	if err != nil {
-		log.Printf("Write: %s\n", err)
-	}
+	// 构造响应报文
+	log.Println(respLine)
+	response.Message(conn, respLine, body)
 }
