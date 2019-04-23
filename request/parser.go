@@ -3,9 +3,7 @@ package request
 import (
 	"github.com/lwlwilliam/httpServer/response"
 	"io/ioutil"
-	"log"
 	"os"
-	"runtime"
 	"strings"
 )
 
@@ -54,9 +52,6 @@ func parseReqLine(line string) (r response.ResponseLine, content []byte) {
 // GET 方法处理
 func get(path string) (code string, status []byte, body []byte) {
 	wd, _ := os.Getwd()
-	//log.Printf("working directory: %s\n", wd)
-	//log.Printf("request path: %s\n", path)
-	log.Println(runtime.GOOS)
 	if path == "/" {
 		path = "index.html"
 	}
@@ -68,6 +63,7 @@ func get(path string) (code string, status []byte, body []byte) {
 		code = response.NOT_FOUND
 		status, _ = response.Status(code)
 		body = status
+		return
 	}
 
 	body, err = ioutil.ReadAll(file)

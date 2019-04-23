@@ -2,15 +2,13 @@
 package response
 
 import (
-	"net"
 	"bytes"
-	"log"
+	"net"
 )
 
 // 根据请求行构造响应报文
 func Message(conn net.Conn, respLine ResponseLine, body []byte)  {
 	buf := bytes.NewBuffer(nil)
-	log.Println(respLine)
 
 	// 响应行
 	//buf.WriteString(string(respLine.Version))	// TODO: 不知道什么原因，获取到的会多了一个字符

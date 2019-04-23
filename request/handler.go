@@ -10,6 +10,7 @@ import (
 )
 
 func Handler(conn net.Conn) {
+	log.Printf("Handling the request from %s.", conn.RemoteAddr().String())
 	defer conn.Close()
 
 	buf := make([]byte, 1024)
@@ -29,6 +30,6 @@ func Handler(conn net.Conn) {
 	respLine, body := parseReqLine(reqStringLine)
 
 	// 构造响应报文
-	log.Println(respLine)
 	response.Message(conn, respLine, body)
+	log.Printf("Has Reponsed the %s correctly.\n", conn.RemoteAddr())
 }
