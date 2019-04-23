@@ -2,79 +2,81 @@ package request
 
 import (
 	"github.com/lwlwilliam/httpServer/response"
+	"github.com/lwlwilliam/httpServer/server"
 	"io/ioutil"
+	"log"
 	"os"
 	"strings"
 )
 
 // 解析请求行
-func parseReqLine(line string) (r response.ResponseLine, content []byte) {
-	reqSlice := strings.Split(line, " ")
-	if len(reqSlice) != 3 {
-		//http.StatusBadRequest
-		r.Code = response.BAD_REQUEST
-		r.Status, _ = response.Status(r.Code)
-        content = r.Status
-        return
+func parseReqLine(m *response.Message, line string) (err error) {
+	linePart := strings.Split(line, " ")
+	m.Headers = []string{
+		server.Version,
+		response.ContentType["plain"],
 	}
 
-	httpVerb, path := reqSlice[0], reqSlice[1]
-	r.Version = []byte(reqSlice[2])
+	if len(linePart) != 3 {
+		//http.StatusBadRequest
+		m.Version = response.HTTPVersion
+		m.Code = response.BadRequest
+		m.Text, _ = response.Text(m.Code)
+		m.Body = m.Text
+		return nil
+	}
+
+	httpVerb, path := linePart[0], linePart[1]
+	m.Version = linePart[2]
 
 	switch httpVerb {
 	case "GET":
-		r.Code, r.Status, content = get(path)
+		m.Code, m.Text, m.Body = get(path)
 	case "POST":
-		//http.StatusBadRequest
-		r.Code = response.BAD_REQUEST
-		r.Status, _ = response.Status(r.Code)
-		content = r.Status
+		fallthrough
 	case "HEAD":
-		//http.StatusBadRequest
-		r.Code = response.BAD_REQUEST
-		r.Status, _ = response.Status(r.Code)
-		content = r.Status
+		fallthrough
 	case "DELETE":
-		//http.StatusBadRequest
-		r.Code = response.BAD_REQUEST
-		r.Status, _ = response.Status(r.Code)
-		content = r.Status
+		fallthrough
 	default:
 		//http.StatusBadRequest
-		r.Code = response.BAD_REQUEST
-		r.Status, _ = response.Status(r.Code)
-		content = r.Status
+		m.Code = response.BadRequest
+		m.Text, _ = response.Text(m.Code)
+		m.Body = m.Text
 	}
 
 	return
 }
 
 // GET 方法处理
-func get(path string) (code string, status []byte, body []byte) {
+func get(path string) (code string, text string, body string) {
 	wd, _ := os.Getwd()
 	if path == "/" {
-		path = "index.html"
+		path = "/index.html"
 	}
 
 	path = wd + path
+	log.Printf("GET %s\n", path)
+
 	file, err := os.Open(path)
 	if err != nil {
 		//http.StatusNotFound
-		code = response.NOT_FOUND
-		status, _ = response.Status(code)
-		body = status
+		code = response.NotFound
+		text, _ = response.Text(code)
+		body = text
 		return
 	}
 
-	body, err = ioutil.ReadAll(file)
+	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		//http.StatusInternalServerError
-		code = response.INTERNAL_SERVER_ERROR
-		status, _ = response.Status(code)
-		body = status
+		code = response.InternalServerError
+		text, _ = response.Text(code)
+		body = text
 	} else {
 		code = response.OK
-		status, _ = response.Status(code)
+		text, _ = response.Text(code)
+		body = string(content)
 	}
-	return code, status, body
+	return code, text, body
 }

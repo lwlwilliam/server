@@ -26,10 +26,11 @@ func Handler(conn net.Conn) {
 	reqString := string(buf[:n])
 
 	// 解析请求行
-	reqStringLine := strings.Split(reqString, "\n")[0] // 请求行
-	respLine, body := parseReqLine(reqStringLine)
+	reqLine := strings.Split(reqString, "\n")[0] // 请求行
+	var m response.Message
+	parseReqLine(&m, reqLine)
+	m.Response(conn)
 
 	// 构造响应报文
-	response.Message(conn, respLine, body)
-	log.Printf("Has Reponsed the %s correctly.\n", conn.RemoteAddr())
+	log.Printf("Has Reponsed the %s.\n", conn.RemoteAddr())
 }
