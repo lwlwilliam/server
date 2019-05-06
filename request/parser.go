@@ -14,7 +14,7 @@ func parseReqLine(m *response.Message, line string) (err error) {
 	linePart := strings.Split(line, " ")
 	m.Headers = []string{
 		server.Version,
-		response.ContentType["plain"],
+		//response.ContentType["plain"],
 	}
 
 	if len(linePart) != 3 {
@@ -22,6 +22,7 @@ func parseReqLine(m *response.Message, line string) (err error) {
 		m.Version = response.HTTPVersion
 		m.Code = response.BadRequest
 		m.Text, _ = response.Text(m.Code)
+		m.Headers = append(m.Headers, response.ContentType["plain"])
 		m.Body = m.Text
 		return nil
 	}
@@ -32,6 +33,14 @@ func parseReqLine(m *response.Message, line string) (err error) {
 	switch httpVerb {
 	case "GET":
 		m.Code, m.Text, m.Body = get(path)
+
+		if (strings.LastIndex(path, "/") == len(path) ||
+			strings.HasSuffix(path, ".html")) && m.Code == response.OK {
+			m.Headers = append(m.Headers, response.ContentType["html"])
+		} else {
+			m.Headers = append(m.Headers, response.ContentType["plain"])
+		}
+
 	case "POST":
 		fallthrough
 	case "HEAD":
@@ -42,6 +51,7 @@ func parseReqLine(m *response.Message, line string) (err error) {
 		//http.StatusBadRequest
 		m.Code = response.BadRequest
 		m.Text, _ = response.Text(m.Code)
+		m.Headers = append(m.Headers, response.ContentType["plain"])
 		m.Body = m.Text
 	}
 
