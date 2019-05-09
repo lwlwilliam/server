@@ -1,8 +1,8 @@
 package request
 
 import (
-	"github.com/lwlwilliam/httpServer/response"
-	"github.com/lwlwilliam/httpServer/server"
+	"github.com/lwlwilliam/server/response"
+	"github.com/lwlwilliam/server/server"
 	"io/ioutil"
 	"log"
 	"os"

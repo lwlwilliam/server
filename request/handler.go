@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/lwlwilliam/httpServer/response"
+	"github.com/lwlwilliam/server/response"
 )
 
 func Handler(conn net.Conn) {

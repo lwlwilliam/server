@@ -14,7 +14,7 @@ and be more familiar with the network programming.
 
 
     ```bash
-    $ go get github.com/lwlwilliam/httpServer
+    $ go get github.com/lwlwilliam/server
     $ go build main.go
     ```
 
