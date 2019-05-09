@@ -1,4 +1,4 @@
-# httpServer
+# server
 
 This repository implements http server through socket in go language.
 
