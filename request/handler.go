@@ -18,7 +18,7 @@ func Handler(conn net.Conn) {
 
 	b := make([]byte, 1)
 	buff := bytes.NewBuffer(nil)
-	conn.SetReadDeadline(time.Now().Add(120 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(60 * time.Second))
 	for {
 		n, err := conn.Read(b)
 		if err != nil && err != io.EOF {
@@ -64,7 +64,7 @@ func Handler(conn net.Conn) {
 	reqString := buff.String()
 
 	// 解析请求行
-	reqLine := strings.Split(reqString, "\n")[0] // 请求行
+	reqLine := strings.TrimSpace(strings.Split(reqString, "\n")[0]) // 请求行
 	var m response.Message
 	parseReqLine(&m, reqLine)
 	m.Response(conn)

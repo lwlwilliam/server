@@ -27,16 +27,37 @@ func parseReqLine(m *response.Message, line string) (err error) {
 		return nil
 	}
 
-	httpVerb, path := linePart[0], linePart[1]
+	httpVerb, url := linePart[0], linePart[1]
 	m.Version = linePart[2]
 
 	switch httpVerb {
 	case "GET":
-		m.Code, m.Text, m.Body = get(path)
+		m.Code, m.Text, m.Body = get(url)
 
-		if (path == "/" || strings.HasSuffix(path, ".html")) && m.Code == response.OK {
+		path := strings.Split(url, "?")[0]
+		seg := strings.Split(path, ".")
+		var ext string
+		if len(seg) == 2 {
+			ext = seg[1]
+		}
+
+		switch ext {
+		case "":
+		case "html":
+			fallthrough
+		case "htm":
 			m.Headers = append(m.Headers, response.ContentType["html"])
-		} else {
+		case "png":
+			m.Headers = append(m.Headers, response.ContentType["png"])
+		case "jpg":
+			fallthrough
+		case "jpeg":
+			m.Headers = append(m.Headers, response.ContentType["jpeg"])
+		case "gif":
+			m.Headers = append(m.Headers, response.ContentType["gif"])
+		case "json":
+			m.Headers = append(m.Headers, response.ContentType["json"])
+		default:
 			m.Headers = append(m.Headers, response.ContentType["plain"])
 		}
 
@@ -58,12 +79,14 @@ func parseReqLine(m *response.Message, line string) (err error) {
 }
 
 // GET 方法处理
-func get(path string) (code string, text string, body string) {
+func get(url string) (code string, text string, body string) {
 	var wd string
-	if server.Htdocs == "" {
+	path := strings.Split(url, "?")[0]
+
+	if server.DocumentRoot == "" {
 		wd, _ = os.Getwd()
 	} else {
-		wd = server.Htdocs
+		wd = server.DocumentRoot
 	}
 
 	if path == "/" {
