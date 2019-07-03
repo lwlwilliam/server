@@ -23,8 +23,7 @@ Although the Go language has imbedded http server in net/http package, but I wan
     ```
     
 
-    After that, try to access [http://localhost:8000](http://localhost:8000) on the
-    browser directly. Also, you can specify the host and port with flags. Just like this.
+    Also, you can specify the host and port with flags. Just like this.
 
 
     ```bash
