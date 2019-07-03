@@ -34,8 +34,7 @@ func parseReqLine(m *response.Message, line string) (err error) {
 	case "GET":
 		m.Code, m.Text, m.Body = get(path)
 
-		if (strings.LastIndex(path, "/") == len(path) ||
-			strings.HasSuffix(path, ".html")) && m.Code == response.OK {
+		if (path == "/" || strings.HasSuffix(path, ".html")) && m.Code == response.OK {
 			m.Headers = append(m.Headers, response.ContentType["html"])
 		} else {
 			m.Headers = append(m.Headers, response.ContentType["plain"])
@@ -60,7 +59,13 @@ func parseReqLine(m *response.Message, line string) (err error) {
 
 // GET 方法处理
 func get(path string) (code string, text string, body string) {
-	wd, _ := os.Getwd()
+	var wd string
+	if server.Htdocs == "" {
+		wd, _ = os.Getwd()
+	} else {
+		wd = server.Htdocs
+	}
+
 	if path == "/" {
 		path = "/index.html"
 	}
