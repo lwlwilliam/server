@@ -6,24 +6,60 @@ import (
 	"net"
 	"strings"
 
+	"bytes"
 	"github.com/lwlwilliam/server/response"
+	"strconv"
 )
 
 func Handler(conn net.Conn) {
 	log.Printf("Handling the request from %s.", conn.RemoteAddr().String())
 	defer conn.Close()
 
-	buf := make([]byte, 1024)
-	//for {
-		// TODO: 怎么读，读多少字节，这是个问题，暂时用一个大的 slice 确保读完所有内容吧
-		n, err := conn.Read(buf)
+	b := make([]byte, 1)
+	buff := bytes.NewBuffer(nil)
+	for {
+		n, err := conn.Read(b)
 		if err != nil && err != io.EOF {
-			log.Printf("Read: %s\n", err.Error())
-			//	break
+			log.Printf("Read error: %s\n", err.Error())
+			break
 		}
-	//}
 
-	reqString := string(buf[:n])
+		buff.Write(b[:n])
+
+		// 请求头结束标记
+		if b[0] == '\n' && string(buff.String()[buff.Len()-4:buff.Len()]) == "\r\n\r\n" {
+			headers := strings.Split(buff.String()[:buff.Len()-4], "\r\n")
+			hasContentLen := false
+			contentLen := 0
+			for _, header := range headers {
+				if strings.HasPrefix(strings.ToLower(header), "content-length") {
+					hasContentLen = true
+					contentLen, err = strconv.Atoi(strings.TrimSpace(strings.Split(header, ":")[1]))
+					if err != nil {
+						log.Println("strconv.Atoi error:", err)
+					}
+					break
+				}
+			}
+
+			if hasContentLen {
+				for contentLen > 0 {
+					n, err := conn.Read(b)
+					if err != nil && err != io.EOF {
+						log.Printf("Read error: %s\n", err.Error())
+						break
+					}
+
+					buff.Write(b[:n])
+					contentLen--
+				}
+			}
+
+			break
+		}
+	}
+
+	reqString := buff.String()
 
 	// 解析请求行
 	reqLine := strings.Split(reqString, "\n")[0] // 请求行
