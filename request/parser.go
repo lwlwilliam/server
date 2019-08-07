@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"os/exec"
+	"strings"
 )
 
 // 解析请求行
@@ -99,15 +99,13 @@ func get(url string) (code string, text string, body string) {
 	path = wd + path
 	log.Printf("GET %s\n", path)
 
-
 	/***************************************************/
 	// TODO: 暂时先用这种简陋的方法处理 php（在接收到 php 文件请求时，调用 php 解释器，接收解释器运行结果，再返回给浏览器），先理解大概运行机制，以后慢慢完善吧
-	// TODO: 还有个问题，貌似只能接收 echo 这种输出，类似 var_dump, print_r 这种是不行的
 	segments := strings.Split(path, "/")
 	for _, seg := range segments {
 		if strings.HasSuffix(seg, ".php") {
-			log.Println("PHP file:", wd + string(os.PathSeparator) + seg)
-			cmd := exec.Command("php", "-f", wd + string(os.PathSeparator) + seg)
+			log.Println("PHP file:", wd+string(os.PathSeparator)+seg)
+			cmd := exec.Command("php", "-f", wd+string(os.PathSeparator)+seg)
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				log.Println("PHP error:", err)
@@ -126,7 +124,6 @@ func get(url string) (code string, text string, body string) {
 		}
 	}
 	/***************************************************/
-
 
 	file, err := os.Open(path)
 	if err != nil {
