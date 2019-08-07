@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"os/exec"
 )
 
 // 解析请求行
@@ -57,6 +58,8 @@ func parseReqLine(m *response.Message, line string) (err error) {
 			m.Headers = append(m.Headers, response.ContentType["gif"])
 		case "json":
 			m.Headers = append(m.Headers, response.ContentType["json"])
+		case "php":
+			m.Headers = append(m.Headers, response.ContentType["html"])
 		default:
 			m.Headers = append(m.Headers, response.ContentType["plain"])
 		}
@@ -95,6 +98,35 @@ func get(url string) (code string, text string, body string) {
 
 	path = wd + path
 	log.Printf("GET %s\n", path)
+
+
+	/***************************************************/
+	// TODO: 暂时先用这种简陋的方法处理 php（在接收到 php 文件请求时，调用 php 解释器，接收解释器运行结果，再返回给浏览器），先理解大概运行机制，以后慢慢完善吧
+	// TODO: 还有个问题，貌似只能接收 echo 这种输出，类似 var_dump, print_r 这种是不行的
+	segments := strings.Split(path, "/")
+	for _, seg := range segments {
+		if strings.HasSuffix(seg, ".php") {
+			log.Println("PHP file:", wd + string(os.PathSeparator) + seg)
+			cmd := exec.Command("php", "-f", wd + string(os.PathSeparator) + seg)
+			output, err := cmd.CombinedOutput()
+			if err != nil {
+				log.Println("PHP error:", err)
+				code = response.NotFound
+				text, _ = response.Text(code)
+				body = text
+				return
+			}
+
+			log.Printf("PHP output: %s\n", output)
+
+			code = response.OK
+			text, _ = response.Text(code)
+			body = string(output)
+			return
+		}
+	}
+	/***************************************************/
+
 
 	file, err := os.Open(path)
 	if err != nil {
