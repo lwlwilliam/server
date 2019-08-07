@@ -1,26 +1,15 @@
 package response
 
-import "errors"
-
 const (
-	OK                  = "200"
-	NotFound            = "404"
-	BadRequest          = "400"
-	InternalServerError = "500"
+	OK                  = 200
+	BadRequest          = 400
+	NotFound            = 404
+	InternalServerError = 500
 )
 
-var StatusText = map[string]string{
+var status = map[int]string{
 	OK:                  "OK",
-	NotFound:            "Not Found",
 	BadRequest:          "Bad Request",
+	NotFound:            "Not Found",
 	InternalServerError: "Internal Server Error",
-}
-
-func Text(code string) (text string, err error) {
-	if _, ok := StatusText[code]; ok {
-		text = StatusText[code]
-		return text, nil
-	}
-
-	return "", errors.New("invalid status code")
 }

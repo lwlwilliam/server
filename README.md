@@ -12,7 +12,7 @@ Although the Go language has imbedded http server in net/http package, but I wan
     ```bash
     $ go get github.com/lwlwilliam/server
     $ cd $GOPATH/src/github.com/lwlwilliam/server
-    $ vim server/info.go # Change the absolute path of DocumentRoot directory of yourself.
+    $ vim conf/server.go # Change the absolute path of DocumentRoot directory of yourself.
     $ go build main.go
     ```
 

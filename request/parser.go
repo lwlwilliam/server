@@ -1,29 +1,30 @@
 package request
 
 import (
+	"github.com/lwlwilliam/server/conf"
+	"github.com/lwlwilliam/server/mime"
 	"github.com/lwlwilliam/server/response"
-	"github.com/lwlwilliam/server/server"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
+	"strconv"
 )
 
 // 解析请求行
 func parseReqLine(m *response.Message, line string) (err error) {
 	linePart := strings.Split(line, " ")
 	m.Headers = []string{
-		server.Version,
-		//response.ContentType["plain"],
+		conf.Server + conf.LineFeed,
 	}
 
 	if len(linePart) != 3 {
-		//http.StatusBadRequest
-		m.Version = response.HTTPVersion
-		m.Code = response.BadRequest
+		// Bad Request
+		m.Version = conf.DefaultHTTPVersion
+		m.Code = strconv.Itoa(response.BadRequest)
 		m.Text, _ = response.Text(m.Code)
-		m.Headers = append(m.Headers, response.ContentType["plain"])
+		m.Headers = append(m.Headers, mime.Get("plain")+conf.LineFeed)
 		m.Body = m.Text
 		return nil
 	}
@@ -47,21 +48,21 @@ func parseReqLine(m *response.Message, line string) (err error) {
 		case "html":
 			fallthrough
 		case "htm":
-			m.Headers = append(m.Headers, response.ContentType["html"])
+			m.Headers = append(m.Headers, mime.Get("html")+conf.LineFeed)
 		case "png":
-			m.Headers = append(m.Headers, response.ContentType["png"])
+			m.Headers = append(m.Headers, mime.Get("png")+conf.LineFeed)
 		case "jpg":
 			fallthrough
 		case "jpeg":
-			m.Headers = append(m.Headers, response.ContentType["jpeg"])
+			m.Headers = append(m.Headers, mime.Get("jpeg")+conf.LineFeed)
 		case "gif":
-			m.Headers = append(m.Headers, response.ContentType["gif"])
+			m.Headers = append(m.Headers, mime.Get("gif")+conf.LineFeed)
 		case "json":
-			m.Headers = append(m.Headers, response.ContentType["json"])
+			m.Headers = append(m.Headers, mime.Get("json")+conf.LineFeed)
 		case "php":
-			m.Headers = append(m.Headers, response.ContentType["html"])
+			m.Headers = append(m.Headers, mime.Get("html")+conf.LineFeed)
 		default:
-			m.Headers = append(m.Headers, response.ContentType["plain"])
+			m.Headers = append(m.Headers, mime.Get("plain")+conf.LineFeed)
 		}
 
 	case "POST":
@@ -72,9 +73,9 @@ func parseReqLine(m *response.Message, line string) (err error) {
 		fallthrough
 	default:
 		//http.StatusBadRequest
-		m.Code = response.BadRequest
+		m.Code = strconv.Itoa(response.BadRequest)
 		m.Text, _ = response.Text(m.Code)
-		m.Headers = append(m.Headers, response.ContentType["plain"])
+		m.Headers = append(m.Headers, mime.Get("plain")+conf.LineFeed)
 		m.Body = m.Text
 	}
 
@@ -86,10 +87,10 @@ func get(url string) (code string, text string, body string) {
 	var wd string
 	path := strings.Split(url, "?")[0]
 
-	if server.DocumentRoot == "" {
+	if conf.DocumentRoot == "" {
 		wd, _ = os.Getwd()
 	} else {
-		wd = server.DocumentRoot
+		wd = conf.DocumentRoot
 	}
 
 	if path == "/" {
@@ -109,7 +110,7 @@ func get(url string) (code string, text string, body string) {
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				log.Println("PHP error:", err)
-				code = response.NotFound
+				code = strconv.Itoa(response.NotFound)
 				text, _ = response.Text(code)
 				body = text
 				return
@@ -117,7 +118,7 @@ func get(url string) (code string, text string, body string) {
 
 			log.Printf("PHP output: %s\n", output)
 
-			code = response.OK
+			code = strconv.Itoa(response.OK)
 			text, _ = response.Text(code)
 			body = string(output)
 			return
@@ -128,7 +129,7 @@ func get(url string) (code string, text string, body string) {
 	file, err := os.Open(path)
 	if err != nil {
 		//http.StatusNotFound
-		code = response.NotFound
+		code = strconv.Itoa(response.NotFound)
 		text, _ = response.Text(code)
 		body = text
 		return
@@ -137,11 +138,11 @@ func get(url string) (code string, text string, body string) {
 	content, err := ioutil.ReadAll(file)
 	if err != nil {
 		//http.StatusInternalServerError
-		code = response.InternalServerError
+		code = strconv.Itoa(response.InternalServerError)
 		text, _ = response.Text(code)
 		body = text
 	} else {
-		code = response.OK
+		code = strconv.Itoa(response.OK)
 		text, _ = response.Text(code)
 		body = string(content)
 	}

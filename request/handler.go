@@ -67,6 +67,7 @@ func Handler(conn net.Conn) {
 	reqLine := strings.TrimSpace(strings.Split(reqString, "\n")[0]) // 请求行
 	var m response.Message
 	parseReqLine(&m, reqLine)
+	log.Println(m.Version, m.Code, m.Text, m.Headers, m.Body)
 	m.Response(conn)
 
 	// 构造响应报文

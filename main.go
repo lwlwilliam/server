@@ -7,7 +7,6 @@ import (
 	"os"
 	"runtime"
 
-	error2 "github.com/lwlwilliam/server/error"
 	"github.com/lwlwilliam/server/request"
 )
 
@@ -17,20 +16,24 @@ const (
 )
 
 func main() {
+	// working directory
 	wd, _ := os.Getwd()
 	log.Printf("The program run at %s on %s.\n", wd, runtime.GOOS)
 
+	// flags
 	hostname := flag.String("h", HOST, "hostname")
 	port := flag.String("p", PORT, "port")
 	flag.Parse()
 
+	// listen
 	log.Printf("Listening %s:%s...\n", *hostname, *port)
 	ld, err := net.Listen("tcp", *hostname+":"+*port)
 	if err != nil {
 		log.Printf("Listening: %s\n", err.Error())
-		os.Exit(error2.FATAL)
+		os.Exit(1)
 	}
 
+	// accept
 	log.Println("Accepting connections...")
 	for {
 		conn, err := ld.Accept()
