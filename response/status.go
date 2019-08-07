@@ -13,3 +13,12 @@ var status = map[int]string{
 	NotFound:            "Not Found",
 	InternalServerError: "Internal Server Error",
 }
+
+// 获取状态短语
+func StatusText(code int) string {
+	if text, ok := status[code]; ok {
+		return text
+	}
+
+	return status[BadRequest]
+}

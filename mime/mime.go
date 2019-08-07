@@ -1,3 +1,4 @@
+// retrieve mime type
 package mime
 
 import (

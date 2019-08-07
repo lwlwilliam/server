@@ -22,8 +22,8 @@ func parseReqLine(m *response.Message, line string) (err error) {
 	if len(linePart) != 3 {
 		// Bad Request
 		m.Version = conf.DefaultHTTPVersion
+		m.Text = response.StatusText(response.BadRequest)
 		m.Code = strconv.Itoa(response.BadRequest)
-		m.Text, _ = response.Text(m.Code)
 		m.Headers = append(m.Headers, mime.Get("plain")+conf.LineFeed)
 		m.Body = m.Text
 		return nil
@@ -74,7 +74,7 @@ func parseReqLine(m *response.Message, line string) (err error) {
 	default:
 		//http.StatusBadRequest
 		m.Code = strconv.Itoa(response.BadRequest)
-		m.Text, _ = response.Text(m.Code)
+		m.Text = response.StatusText(response.BadRequest)
 		m.Headers = append(m.Headers, mime.Get("plain")+conf.LineFeed)
 		m.Body = m.Text
 	}
@@ -110,8 +110,8 @@ func get(url string) (code string, text string, body string) {
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				log.Println("PHP error:", err)
+				text = response.StatusText(response.NotFound)
 				code = strconv.Itoa(response.NotFound)
-				text, _ = response.Text(code)
 				body = text
 				return
 			}
@@ -119,7 +119,7 @@ func get(url string) (code string, text string, body string) {
 			log.Printf("PHP output: %s\n", output)
 
 			code = strconv.Itoa(response.OK)
-			text, _ = response.Text(code)
+			text = response.StatusText(response.OK)
 			body = string(output)
 			return
 		}
@@ -130,7 +130,7 @@ func get(url string) (code string, text string, body string) {
 	if err != nil {
 		//http.StatusNotFound
 		code = strconv.Itoa(response.NotFound)
-		text, _ = response.Text(code)
+		text = response.StatusText(response.NotFound)
 		body = text
 		return
 	}
@@ -139,11 +139,11 @@ func get(url string) (code string, text string, body string) {
 	if err != nil {
 		//http.StatusInternalServerError
 		code = strconv.Itoa(response.InternalServerError)
-		text, _ = response.Text(code)
+		text = response.StatusText(response.InternalServerError)
 		body = text
 	} else {
 		code = strconv.Itoa(response.OK)
-		text, _ = response.Text(code)
+		text = response.StatusText(response.OK)
 		body = string(content)
 	}
 	return code, text, body

@@ -1,4 +1,4 @@
-// response package defines the format of response message.
+// build the response message
 package response
 
 import (
