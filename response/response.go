@@ -9,7 +9,7 @@ import (
 )
 
 // 响应报文类型
-type Message struct {
+type Msg struct {
 	Version string
 	Code    string
 	Text    string
@@ -18,7 +18,7 @@ type Message struct {
 }
 
 // 响应
-func (m *Message) Response(c net.Conn) (err error) {
+func (m *Msg) Response(c net.Conn) (err error) {
 	buf := bytes.NewBuffer(nil)
 
 	// 响应行

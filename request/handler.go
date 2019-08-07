@@ -1,6 +1,9 @@
 package request
 
 import (
+	"github.com/lwlwilliam/server/conf"
+	"github.com/lwlwilliam/server/errors"
+	"github.com/lwlwilliam/server/parser"
 	"io"
 	"log"
 	"net"
@@ -16,39 +19,54 @@ func Handler(conn net.Conn) {
 	log.Printf("Handling the request from %s.", conn.RemoteAddr().String())
 	defer conn.Close()
 
+	// 设置读缓冲以及超时
 	b := make([]byte, 1)
 	buff := bytes.NewBuffer(nil)
-	conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	err := conn.SetReadDeadline(time.Now().Add(60 * time.Second))
+	errors.Fatal(err)
+
 	for {
 		n, err := conn.Read(b)
 		if err != nil && err != io.EOF {
-			log.Printf("Read error: %s\n", err.Error())
+			log.Printf("request.Handler Read error: %s\n", err.Error())
 			break
 		}
 
 		buff.Write(b[:n])
 
 		// 请求头结束标记
-		if b[0] == '\n' && buff.Len() > 4 && string(buff.String()[buff.Len()-4:buff.Len()]) == "\r\n\r\n" {
-			headers := strings.Split(buff.String()[:buff.Len()-4], "\r\n")
+		if b[0] == '\n' &&
+			buff.Len() > 4 && // 这是为了确保下面的 buff.Len() - 4 不会溢出
+			string(buff.String()[buff.Len()-4:buff.Len()]) == (conf.LineFeed+conf.LineFeed) { // 读取已有缓冲的最后 4 个字节
+
+			headers := strings.Split(buff.String()[:buff.Len()-4], conf.LineFeed)
+
+			// 获取请求报文长度
 			hasContentLen := false
 			contentLen := 0
 			for _, header := range headers {
-				if strings.HasPrefix(strings.ToLower(header), "content-length") {
+
+				header = strings.ToLower(header)
+				if strings.HasPrefix(header, "content-length:") {
 					hasContentLen = true
-					contentLen, err = strconv.Atoi(strings.TrimSpace(strings.Split(header, ":")[1]))
+
+					contentLenStr := strings.TrimSpace(strings.Split(header, ":")[1])
+					contentLen, err = strconv.Atoi(contentLenStr)
+
 					if err != nil {
-						log.Println("strconv.Atoi error:", err)
+						log.Println("request.Handler Atoi error:", err)
 					}
+
 					break
 				}
 			}
 
+			// 如果报文标明了长度，则继续读取 contentLen 个字节
 			if hasContentLen {
 				for contentLen > 0 {
 					n, err := conn.Read(b)
 					if err != nil && err != io.EOF {
-						log.Printf("Read error: %s\n", err.Error())
+						log.Printf("request.Handler Read error: %s\n", err.Error())
 						break
 					}
 
@@ -61,12 +79,16 @@ func Handler(conn net.Conn) {
 		}
 	}
 
-	reqString := buff.String()
+	requestMessage := buff.String()
 
 	// 解析请求行
-	reqLine := strings.TrimSpace(strings.Split(reqString, "\n")[0]) // 请求行
-	var m response.Message
-	parseReqLine(&m, reqLine)
+	requestLine := strings.TrimSpace(strings.Split(requestMessage, conf.LineFeed)[0])
+	lineStruct, err := parser.Line(requestLine)
+	log.Println(lineStruct)
+
+	// TODO: 重构报文解释模块
+	var m response.Msg
+	parseReqLine(&m, requestLine)
 	log.Println(m.Version, m.Code, m.Text, m.Headers, m.Body)
 	m.Response(conn)
 

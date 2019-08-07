@@ -13,7 +13,7 @@ import (
 )
 
 // 解析请求行
-func parseReqLine(m *response.Message, line string) (err error) {
+func parseReqLine(m *response.Msg, line string) (err error) {
 	linePart := strings.Split(line, " ")
 	m.Headers = []string{
 		conf.Server + conf.LineFeed,
