@@ -15,7 +15,6 @@ import (
 )
 
 func Get(lineStruct parser.LineStruct) response.Message {
-	log.Println(lineStruct.Path, strings.TrimPrefix(lineStruct.Path, "/"))
 	file := strings.TrimSuffix(conf.DocumentRoot, "/") + conf.PathSeparator +
 		strings.TrimPrefix(lineStruct.Path, "/")
 	ext := strings.TrimPrefix(filepath.Ext(file), ".")
@@ -31,7 +30,7 @@ func Get(lineStruct parser.LineStruct) response.Message {
 		ext = "jpg"
 	}
 
-	log.Println("GET:", file, "ext:", ext)
+	log.Println("GET:", file, "; ext:", ext)
 	buildMessage(file, ext, lineStruct, &m)
 
 	return m
@@ -49,7 +48,7 @@ func buildMessage(file, ext string, lineStruct parser.LineStruct, m *response.Me
 	// TODO: 有没有可能根据 fn 对应的名字来自动调用包函数
 	// 动态页面
 	if fn, ok := conf.Plugins[ext]; ok {
-		log.Println("request PHP")
+		log.Println("Request PHP")
 		var body string
 		var err error
 

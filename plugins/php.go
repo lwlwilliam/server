@@ -17,7 +17,7 @@ func PHP(file string) (string, error) {
 		return response.StatusText(response.InternalServerError), errors.New("PHP execute error")
 	}
 
-	log.Printf("PHP output: %s\n", output)
+	//log.Printf("PHP output: %s\n", output)
 
 	return string(output), nil
 }

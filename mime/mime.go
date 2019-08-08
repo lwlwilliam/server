@@ -19,10 +19,10 @@ var contentType = map[string]string{
 // 获取 Content-Type 响应头
 func Get(ext string) string {
 	if tp, ok := contentType[ext]; ok {
-		return fmt.Sprintf("Content-Type:%s;charset=%s",
+		return fmt.Sprintf("Content-Type: %s;charset=%s",
 			tp, conf.DefaultCharset)
 	}
 
-	return fmt.Sprintf("Content-Type:%s;charset=%s",
+	return fmt.Sprintf("Content-Type: %s;charset=%s",
 		contentType["plain"], conf.DefaultCharset)
 }
