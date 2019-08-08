@@ -1,6 +1,9 @@
 package response
 
-import "testing"
+import (
+	"github.com/lwlwilliam/server/conf"
+	"testing"
+)
 
 func TestLine(t *testing.T) {
 	tests := []struct {
@@ -9,10 +12,10 @@ func TestLine(t *testing.T) {
 		expected    string
 	}{
 		{
-			200, "HTTP/1.1", "HTTP/1.1 200 OK",
+			200, conf.DefaultHTTPVersion, "HTTP/1.1 200 OK",
 		},
 		{
-			404, "HTTP/1.1", "HTTP/1.1 404 Not Found",
+			404, conf.DefaultHTTPVersion, "HTTP/1.1 404 Not Found",
 		},
 	}
 

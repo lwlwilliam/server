@@ -2,7 +2,7 @@ package parser
 
 import "testing"
 
-func TestLine(t *testing.T) {
+func TestRequestLine(t *testing.T) {
 	tests := []struct {
 		input       string
 		method      string
@@ -30,7 +30,7 @@ func TestLine(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		lineS, err := Line(tt.input)
+		lineS, err := RequestLine(tt.input)
 		if err != nil {
 			t.Errorf("Line error: %s", err.Error())
 		}

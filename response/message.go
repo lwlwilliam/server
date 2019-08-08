@@ -13,10 +13,10 @@ type Message struct {
 }
 
 // 构造报文
-func Build(line string, headers []string, body string) string {
+func (m *Message) Build() string {
 	return fmt.Sprintf("%s%s%s%s%s%s",
-		line, conf.LineFeed,
-		strings.Join(headers, conf.LineFeed), conf.LineFeed,
+		m.Line, conf.LineFeed,
+		strings.Join(m.Headers, conf.LineFeed), conf.LineFeed,
 		conf.LineFeed,
-		body)
+		m.Body)
 }

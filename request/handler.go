@@ -79,19 +79,32 @@ func Handler(conn net.Conn) {
 		}
 	}
 
+	// 完整的请求报文
 	requestMessage := buff.String()
 
 	// 解析请求行
 	requestLine := strings.TrimSpace(strings.Split(requestMessage, conf.LineFeed)[0])
-	lineStruct, err := parser.Line(requestLine)
-	log.Println(lineStruct)
+	lineStruct, err := parser.RequestLine(requestLine)
 
-	// TODO: 重构报文解释模块
-	var m response.Msg
-	parseReqLine(&m, requestLine)
-	log.Println(m.Version, m.Code, m.Text, m.Headers, m.Body)
-	m.Response(conn)
+	var message response.Message
 
-	// 构造响应报文
+	switch lineStruct.Method {
+	case "GET":
+		message = Get(lineStruct)
+	case "POST":
+		fallthrough
+	case "PUT":
+		fallthrough
+	case "DELETE":
+		fallthrough
+	case "HEAD":
+		fallthrough
+	default:
+		message = Get(lineStruct)
+	}
+
+	messageStr := message.Build()
+	conn.Write([]byte(messageStr))
+
 	log.Printf("Has Reponsed the %s.\n", conn.RemoteAddr())
 }

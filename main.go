@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/lwlwilliam/server/request"
+	"github.com/lwlwilliam/server/errors"
 )
 
 const (
@@ -30,7 +31,7 @@ func main() {
 	ld, err := net.Listen("tcp", *hostname+":"+*port)
 	if err != nil {
 		log.Printf("Listening: %s\n", err.Error())
-		os.Exit(1)
+		os.Exit(errors.Error)
 	}
 
 	// accept

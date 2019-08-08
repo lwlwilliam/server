@@ -13,9 +13,10 @@ var contentType = map[string]string{
 	"jpg":   "image/jpeg",
 	"gif":   "image/gif",
 	"json":  "application/json",
+	"pdf":   "application/pdf",
 }
 
-// Content-Type 响应头
+// 获取 Content-Type 响应头
 func Get(ext string) string {
 	if tp, ok := contentType[ext]; ok {
 		return fmt.Sprintf("Content-Type:%s;charset=%s",

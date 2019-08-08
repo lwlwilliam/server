@@ -12,26 +12,27 @@ type LineStruct struct {
 	HTTPVersion string
 }
 
-// 请求行解释
-func Line(line string) (lineS LineStruct, err error) {
+// 解释请求行
+func RequestLine(line string) (lineS LineStruct, err error) {
+	line = strings.TrimSpace(line)
 	segments := strings.Split(line, " ")
 	if len(segments) != 3 {
 		lineS = LineStruct{"", "", "", ""}
 		return lineS, errors.New("bad request line")
 	}
 
-	method := segments[0]
-	HTTPVersion := segments[2]
-
 	pathinfo := strings.Split(segments[1], "?")
-	path := pathinfo[0]
 	query := ""
 	if len(pathinfo) == 2 {
 		query = pathinfo[1]
 	}
 
-	lineS = LineStruct{method, path, query, HTTPVersion}
+	lineS = LineStruct{
+		Method:      segments[0],
+		Path:        pathinfo[0],
+		Query:       query,
+		HTTPVersion: segments[2],
+	}
 	err = nil
-
 	return
 }
