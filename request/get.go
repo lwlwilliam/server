@@ -48,13 +48,15 @@ func buildMessage(file, ext string, lineStruct parser.LineStruct, m *response.Me
 	// TODO: 有没有可能根据 fn 对应的名字来自动调用包函数
 	// 动态页面
 	if fn, ok := conf.Plugins[ext]; ok {
-		log.Println("Request PHP")
+		log.Println("Request Plugins")
 		var body string
 		var err error
 
 		switch fn {
 		case "PHP":
 			body, err = plugins.PHP(file)
+		case "Python":
+			body, err = plugins.Python(file)
 		}
 
 		if err != nil {

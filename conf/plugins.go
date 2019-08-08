@@ -4,4 +4,5 @@ package conf
 // ext => funcName
 var Plugins = map[string]string{
 	"php": "PHP",
+	"py":  "Python",
 }
