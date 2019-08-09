@@ -4,6 +4,6 @@ import (
 	"github.com/lwlwilliam/server/response"
 )
 
-func NotFound() string {
-	return parse(response.StatusText(response.NotFound))
+func NotFound(m *response.Message) {
+	parse(m, response.NotFound)
 }

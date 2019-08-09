@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"bytes"
+	"github.com/lwlwilliam/server/errors/templates"
 	"github.com/lwlwilliam/server/response"
 	"strconv"
 	"time"
@@ -81,12 +82,16 @@ func Handler(conn net.Conn) {
 
 	// 完整的请求报文
 	requestMessage := buff.String()
+	var message response.Message
 
 	// 解析请求行
 	requestLine := strings.TrimSpace(strings.Split(requestMessage, conf.LineFeed)[0])
 	lineStruct, err := parser.RequestLine(requestLine)
-
-	var message response.Message
+	if err != nil {
+		log.Println("Request line:", requestLine)
+		log.Println("Parse request line:", err)
+		log.Printf("Request line struct: %s, %s, %s\n", lineStruct.Method, lineStruct.Path, lineStruct.HTTPVersion)
+	}
 
 	switch lineStruct.Method {
 	case "GET":
@@ -100,10 +105,11 @@ func Handler(conn net.Conn) {
 	case "HEAD":
 		fallthrough
 	default:
-		message = Get(lineStruct)
+		templates.BadRequest(&message)
 	}
 
 	messageStr := message.Build()
+	//log.Println("Response message:", messageStr)
 	conn.Write([]byte(messageStr))
 
 	log.Printf("Has Reponsed the %s.\n", conn.RemoteAddr())

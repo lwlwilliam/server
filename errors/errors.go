@@ -1,6 +1,8 @@
 package errors
 
-import "os"
+import (
+	"os"
+)
 
 const (
 	Error = 1

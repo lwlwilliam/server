@@ -7,8 +7,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/lwlwilliam/server/request"
 	"github.com/lwlwilliam/server/errors"
+	"github.com/lwlwilliam/server/request"
 )
 
 const (
